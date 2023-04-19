@@ -1,41 +1,19 @@
 import 'package:flutter/material.dart';
-import 'main.dart';
 
+class Dashboard extends StatefulWidget {
+  const Dashboard({Key? key}) : super(key: key);
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  // This widget is the root of your application.
+  @override
+  _DashboardState createState() => _DashboardState();
+}
+class _DashboardState extends State<Dashboard> {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home:MyHomePage(),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage();
-
-
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-
-
-  @override
-  Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        centerTitle: true,
-        title: Text(
-          "dashboard",
-          style: TextStyle(
+        title: const Text('Dashboard'),
+      ),
+      style: TextStyle(
               color: Colors.black,
               fontWeight: FontWeight.bold),
         ),
