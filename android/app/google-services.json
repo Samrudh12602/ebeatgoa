@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "702944838492",
+    "project_id": "e-beat-book-goa-police",
+    "storage_bucket": "e-beat-book-goa-police.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:702944838492:android:beb989d979bc28ac61b799",
+        "android_client_info": {
+          "package_name": "com.example.ebeatgoa"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "702944838492-crugbflp6ooga2dm3jahcqc5ms92ntmu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCERvxje9QmBqynV4-lOWy_IU0E53nWuRg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "702944838492-crugbflp6ooga2dm3jahcqc5ms92ntmu.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "702944838492-i7pgjfvqtnqfk165c5373mvlvs2p7jn4.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.ebeatgoa"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
