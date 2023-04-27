@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'register.dart';
 import 'login_page.dart';
 import 'maps.dart';
+import 'markingBeatAreas.dart';
 import 'dataview.dart';
 import 'about_us.dart';
 import 'profile.dart';
@@ -32,7 +33,7 @@ class MyApp extends StatelessWidget {
         '/login': (context) => LoginPage(),
         '/home': (context) => HomePage(),
         '/register': (context) => RegisterPage(),
-        '/maps': (context) => MapScreen(),
+        '/maps': (context) => MapTest(),
         '/profile': (context) => Profile(),
         '/data': (context) => ViewData(),
         '/about': (context) => AboutUs(),
