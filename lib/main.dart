@@ -2,7 +2,7 @@ import 'package:EbeatGoa/home.dart';
 import 'package:flutter/material.dart';
 import 'register.dart';
 import 'login_page.dart';
-import 'maps.dart';
+import 'markingBeatAreas.dart';
 import 'markingBeatAreas.dart';
 import 'dataview.dart';
 import 'about_us.dart';
@@ -33,7 +33,7 @@ class MyApp extends StatelessWidget {
         '/login': (context) => LoginPage(),
         '/home': (context) => HomePage(),
         '/register': (context) => RegisterPage(),
-        '/maps': (context) => MapTest(),
+        '/maps': (context) => MapScreen(),
         '/profile': (context) => Profile(),
         '/data': (context) => ViewData(),
         '/about': (context) => AboutUs(),

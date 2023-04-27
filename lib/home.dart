@@ -1,6 +1,5 @@
 import 'package:EbeatGoa/markingBeatAreas.dart';
 import 'package:flutter/material.dart';
-import 'maps.dart';
 import 'markingBeatAreas.dart';
 import 'dataview.dart';
 import 'profile.dart';
@@ -15,7 +14,7 @@ class _HomePageState extends State<HomePage> {
   int _currentIndex = 0;
   final List<Widget> _children = [
     Home(),
-    MapTest(),
+    MapScreen(),
     Profile(),
     ViewData(),
     AboutUs(),
