@@ -1,6 +1,12 @@
+import 'package:EbeatGoa/home.dart';
 import 'package:flutter/material.dart';
 import 'register.dart';
 import 'login_page.dart';
+import 'maps.dart';
+import 'dataview.dart';
+import 'about_us.dart';
+import 'profile.dart';
+import 'home.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 void main() async {
@@ -23,7 +29,12 @@ class MyApp extends StatelessWidget {
       home: LoginPage(),
       routes: {
         '/login': (context) => LoginPage(),
+        '/home':(context) => HomePage(),
         '/register': (context) => RegisterPage(),
+        '/maps': (context) => Maps(),
+        '/profile': (context) => Profile(),
+        '/data': (context) => ViewData(),
+        '/about': (context) => AboutUs(),
       },
     );
   }
