@@ -11,7 +11,13 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _currentIndex = 0;
-  final List<Widget> _children = [    Home(),    Maps(),    Profile(),    ViewData(),    AboutUs(),  ];
+  final List<Widget> _children = [
+    Home(),
+    MapScreen(),
+    Profile(),
+    ViewData(),
+    AboutUs(),
+  ];
 
   @override
   Widget build(BuildContext context) {

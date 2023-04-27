@@ -22,6 +22,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'My App',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.green,
         accentColor: Colors.yellow,
@@ -29,9 +30,9 @@ class MyApp extends StatelessWidget {
       home: LoginPage(),
       routes: {
         '/login': (context) => LoginPage(),
-        '/home':(context) => HomePage(),
+        '/home': (context) => HomePage(),
         '/register': (context) => RegisterPage(),
-        '/maps': (context) => Maps(),
+        '/maps': (context) => MapScreen(),
         '/profile': (context) => Profile(),
         '/data': (context) => ViewData(),
         '/about': (context) => AboutUs(),

@@ -1,66 +1,63 @@
-import 'package:flutter/cupertino.dart';
-import 'home.dart';
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 
-class Maps extends StatefulWidget {
-  const Maps({Key? key}) : super(key: key);
-
+class MapScreen extends StatefulWidget {
   @override
-  _MapsState createState() => _MapsState();
+  _MapScreenState createState() => _MapScreenState();
 }
-class _MapsState extends State<Maps> {
-  GoogleMapController? _controller;
+
+class _MapScreenState extends State<MapScreen> {
+  late GoogleMapController _controller;
+
   Location _location = Location();
-  // late BitmapDescriptor _markerIcon;
-  late BitmapDescriptor _markerIcon = BitmapDescriptor.defaultMarker;
+  StreamSubscription<LocationData>? _locationSubscription;
 
-
-  @override
-  // void initState() {
-  //   super.initState();
-  //   _location.onLocationChanged.listen((LocationData currentLocation) {
-  //     _controller?.animateCamera(CameraUpdate.newCameraPosition(
-  //       CameraPosition(
-  //         target: LatLng(currentLocation.latitude!, currentLocation.longitude!),
-  //         zoom: 16.0,
-  //       ),
-  //     ));
-  //   });
-  // late BitmapDescriptor _markerIcon;
+  Marker? _marker;
 
   @override
   void initState() {
     super.initState();
-    BitmapDescriptor.fromAssetImage(ImageConfiguration(size: Size(48, 48)), 'assets/images/marker.png')
-        .then((icon) => setState(() => _markerIcon = icon));
+
+    // Get the user's current location
+    _locationSubscription = _location.onLocationChanged.listen((locationData) {
+      if (_controller != null) {
+        // Update the map's camera position
+        _controller.animateCamera(CameraUpdate.newLatLng(
+            LatLng(locationData.latitude!, locationData.longitude!)));
+
+        // Update the user's location marker
+        setState(() {
+          _marker = Marker(
+            markerId: MarkerId("user_location"),
+            position: LatLng(locationData.latitude!, locationData.longitude!),
+          );
+        });
+      }
+    });
   }
 
+  @override
+  void dispose() {
+    super.dispose();
 
-  // BitmapDescriptor.fromAssetImage(ImageConfiguration(size: Size(48, 48)), 'assets/images/marker.png')
-  //       .then((icon) => _markerIcon = icon);
-  // }
+    // Stop listening to location updates
+    _locationSubscription?.cancel();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: GoogleMap(
-        onMapCreated: (GoogleMapController controller) {
+        initialCameraPosition: CameraPosition(
+          target: LatLng(37.7749, -122.4194), // San Francisco
+          zoom: 15,
+        ),
+        onMapCreated: (controller) {
           _controller = controller;
         },
-        initialCameraPosition: CameraPosition(
-          target: LatLng(0.0, 0.0),
-          zoom: 16.0,
-        ),
-        myLocationEnabled: true,
-        myLocationButtonEnabled: true,
-        markers: Set<Marker>.of([
-          Marker(
-            markerId: MarkerId("my_location_marker"),
-            position: LatLng(0.0, 0.0),
-            icon: _markerIcon != null ? _markerIcon : BitmapDescriptor.defaultMarker,
-          ),
-        ]),
+        markers: _marker != null ? Set<Marker>.from([_marker]) : Set<Marker>(),
       ),
     );
   }
