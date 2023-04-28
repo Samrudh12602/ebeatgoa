@@ -79,7 +79,7 @@ class _MapScreenState extends State<MapScreen> {
                         marker.position.latitude,
                         marker.position.longitude) <=
                     100);
-            print(isWithinRadius);
+
             _showPhotoUploadPopup(context, redMarker);
           }
         });
