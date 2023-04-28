@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'register.dart';
 import 'login_page.dart';
 import 'markingBeatAreas.dart';
-import 'markingBeatAreas.dart';
 import 'dataview.dart';
 import 'about_us.dart';
 import 'profile.dart';
@@ -22,7 +21,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'My App',
+      title: 'E-Beat Goa',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.green,

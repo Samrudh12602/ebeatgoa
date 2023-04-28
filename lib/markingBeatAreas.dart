@@ -1,8 +1,8 @@
 import 'dart:async';
-import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:location/location.dart';
+import 'package:geolocator/geolocator.dart';
 
 class MapScreen extends StatefulWidget {
   @override
@@ -11,188 +11,194 @@ class MapScreen extends StatefulWidget {
 
 class _MapScreenState extends State<MapScreen> {
   late GoogleMapController _controller;
-
-  Location _location = Location();
-  StreamSubscription<LocationData>? _locationSubscription;
-
-  final Set<Marker> _markers = {};
-
-  static const LatLng _center = const LatLng(15.4041, 74.0124);
+  late Marker _marker1;
+  late Marker _marker2;
+  late Marker _marker3;
+  late Marker _currentLocationMarker = Marker(
+    markerId: MarkerId('CurrentLocation'),
+    infoWindow: InfoWindow(
+      title: 'You',
+    ),
+    position: LatLng(0, 0),
+    icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
+    zIndex: 2,
+  );
+  late Circle _circle1;
+  late Circle _circle2;
+  late Circle _circle3;
+  LatLng _center1 = LatLng(15.42478, 73.97977);
+  LatLng _center2 = LatLng(15.42275, 73.97932);
+  LatLng _center3 = LatLng(15.42273, 73.98183);
+  late LatLng _currentLocation = LatLng(0, 0);
+  bool _isWithinCircle = false;
 
   @override
   void initState() {
     super.initState();
-    // Get the user's current location
-    _locationSubscription = _location.onLocationChanged.listen((locationData) {
-      if (_controller != null) {
-        // Update the map's camera position
-        _controller.animateCamera(CameraUpdate.newLatLng(
-            LatLng(locationData.latitude!, locationData.longitude!)));
-
-        // Update the user's location marker
-        setState(() {
-          _markers.removeWhere(
-              (marker) => marker.markerId.value == "user_location");
-          _markers.add(
-            Marker(
-              icon: BitmapDescriptor.defaultMarkerWithHue(
-                  BitmapDescriptor.hueGreen),
-              markerId: MarkerId("user_location"),
-              infoWindow: InfoWindow(
-                title: 'Your Location',
-              ),
-              position: LatLng(locationData.latitude!, locationData.longitude!),
-            ),
-          );
-
-          // Check if the user is within the radius of any red marker
-          for (Marker marker in _markers) {
-            if (marker.icon ==
-                BitmapDescriptor.defaultMarkerWithHue(
-                    BitmapDescriptor.hueRed)) {
-              double distance = calculateDistance(
-                  locationData.latitude!,
-                  locationData.longitude!,
-                  marker.position.latitude,
-                  marker.position.longitude);
-              print('Distance from red marker: $distance');
-            }
-          }
-
-          // Check if the user is within the radius of any red marker
-          bool isWithinRadius = _markers.any((marker) =>
-              marker.icon ==
-                  BitmapDescriptor.defaultMarkerWithHue(
-                      BitmapDescriptor.hueRed) &&
-              calculateDistance(locationData.latitude!, locationData.longitude!,
-                      marker.position.latitude, marker.position.longitude) <=
-                  100);
-
-          if (isWithinRadius) {
-            Marker redMarker = _markers.firstWhere((marker) =>
-                marker.icon ==
-                    BitmapDescriptor.defaultMarkerWithHue(
-                        BitmapDescriptor.hueRed) &&
-                calculateDistance(
-                        locationData.latitude!,
-                        locationData.longitude!,
-                        marker.position.latitude,
-                        marker.position.longitude) <=
-                    100);
-
-            _showPhotoUploadPopup(context, redMarker);
-          }
-        });
-      }
-    });
-    // Add the markers for important locations in Ponda, Goa
-    _markers.add(
-      Marker(
-        markerId: MarkerId('Goa College of Engineering'),
-        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
-        position: LatLng(15.42266, 73.98005),
-        infoWindow: InfoWindow(
-          title: 'GEC',
-        ),
-      ),
-    );
-    _markers.add(
-      Marker(
-        markerId: MarkerId('Mechanical Engineering Department'),
-        position: LatLng(15.42399, 73.98119),
-        infoWindow: InfoWindow(
-          title: 'Mechanical Engineering Department',
-        ),
-        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
-      ),
-    );
-    _markers.add(
-      Marker(
-        markerId: MarkerId('Civil Department '),
-        position: LatLng(15.42365, 73.97940),
-        infoWindow: InfoWindow(
-          title: 'Civil Engineering Department',
-        ),
-        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
-      ),
-    );
-    _markers.add(
-      Marker(
+    _marker1 = Marker(
         markerId: MarkerId('IT Department'),
-        position: LatLng(15.42478, 73.97977),
-        infoWindow: InfoWindow(
-          title: 'Information Technology Department',
-        ),
+        position: _center1,
         icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
-      ),
+        infoWindow: InfoWindow(title: 'Information Technology Department'));
+    _marker2 = Marker(
+        markerId: MarkerId('GEC Canteen'),
+        position: _center2,
+        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+        infoWindow: InfoWindow(title: 'GEC CANTEEN '));
+    _marker3 = Marker(
+      markerId: MarkerId('Marker3'),
+      position: _center3,
+      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
     );
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-
-    // Stop listening to location updates
-    _locationSubscription?.cancel();
+    _circle1 = Circle(
+      circleId: CircleId('Circle1'),
+      center: _center1,
+      radius: 100.0,
+      fillColor: Colors.blue.withOpacity(0.1),
+      strokeWidth: 0,
+    );
+    _circle2 = Circle(
+      circleId: CircleId('Circle2'),
+      center: _center2,
+      radius: 100.0,
+      fillColor: Colors.red.withOpacity(0.1),
+      strokeWidth: 0,
+    );
+    _circle3 = Circle(
+      circleId: CircleId('Circle3'),
+      center: _center3,
+      radius: 100.0,
+      fillColor: Colors.green.withOpacity(0.1),
+      strokeWidth: 0,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: GoogleMap(
-        onMapCreated: _onMapCreated,
-        markers: _markers,
-        initialCameraPosition: CameraPosition(
-          target: _center,
-          zoom: 15.0,
-        ),
+      body: Stack(
+        children: [
+          GoogleMap(
+            initialCameraPosition: CameraPosition(target: _center1, zoom: 15),
+            markers: Set<Marker>.of(
+                [_marker1, _marker2, _marker3, _currentLocationMarker]),
+            circles: Set<Circle>.of([_circle1, _circle2, _circle3]),
+            onMapCreated: (GoogleMapController controller) {
+              _controller = controller;
+              _getLocation();
+            },
+          ),
+          Positioned(
+            top: 20,
+            right: 20,
+            child: FloatingActionButton(
+              onPressed: () {
+                _checkIfWithinCircle();
+              },
+              child: Icon(Icons.upload),
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  void _onMapCreated(GoogleMapController controller) {
-    _controller = controller;
-  }
-
-  double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
-    const R = 6371; // Earth's radius in kilometers
-    double dLat = (lat2 - lat1) * pi / 180;
-    double dLon = (lon2 - lon1) * pi / 180;
-    double a = sin(dLat / 2) * sin(dLat / 2) +
-        cos(lat1 * pi / 180) *
-            cos(lat2 * pi / 180) *
-            sin(dLon / 2) *
-            sin(dLon / 2);
-    double c = 2 * atan2(sqrt(a), sqrt(1 - a));
-    double d = R * c; // distance in kilometers
-    return d * 1000; // distance in meters
-  }
-
-  void _showPhotoUploadPopup(BuildContext context, Marker marker) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Upload photo?'),
-          content: Text(
-              'Do you want to upload a photo for ${marker.infoWindow.title}?'),
-          actions: <Widget>[
-            TextButton(
-              child: Text('Cancel'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: Text('Upload'),
-              onPressed: () {
-                // TODO: Implement photo upload functionality
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
+  StreamSubscription<Position>? _positionStreamSubscription;
+  void _startListening() {
+    _positionStreamSubscription =
+        Geolocator.getPositionStream().listen((position) {
+      setState(() {
+        _currentLocation = LatLng(position.latitude, position.longitude);
+        _currentLocationMarker =
+            _currentLocationMarker.copyWith(positionParam: _currentLocation);
+        _controller.animateCamera(
+          CameraUpdate.newLatLng(_currentLocation),
         );
-      },
-    );
+      });
+    });
+  }
+
+  void _stopListening() {
+    if (_positionStreamSubscription != null) {
+      _positionStreamSubscription?.cancel();
+    }
+  }
+
+  void _getLocation() {
+    _startListening();
+  }
+
+  void _checkIfWithinCircle() {
+    bool isWithinCircle1 = Geolocator.distanceBetween(
+            _currentLocation.latitude,
+            _currentLocation.longitude,
+            _center1.latitude,
+            _center1.longitude) <=
+        100;
+    bool isWithinCircle2 = Geolocator.distanceBetween(
+            _currentLocation.latitude,
+            _currentLocation.longitude,
+            _center2.latitude,
+            _center2.longitude) <=
+        100;
+    bool isWithinCircle3 = Geolocator.distanceBetween(
+            _currentLocation.latitude,
+            _currentLocation.longitude,
+            _center3.latitude,
+            _center3.longitude) <=
+        100;
+    setState(() {
+      _isWithinCircle = isWithinCircle1 || isWithinCircle2 || isWithinCircle3;
+    });
+    if (_isWithinCircle) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Within circle'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text('Your current location is within one of the circles.'),
+                SizedBox(height: 16),
+                ElevatedButton.icon(
+                  onPressed: () {
+                    // TODO: Implement upload functionality
+                    Navigator.of(context).pop();
+                  },
+                  icon: Icon(Icons.cloud_upload),
+                  label: Text('Upload'),
+                ),
+                SizedBox(height: 8),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('Cancel'),
+                ),
+              ],
+            ),
+          );
+        },
+      );
+    } else {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Outside circle'),
+            content: Text('Your current location is outside all the circles.'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text('Go back'),
+              ),
+            ],
+          );
+        },
+      );
+    }
   }
 }

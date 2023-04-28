@@ -1,4 +1,3 @@
-import 'package:EbeatGoa/markingBeatAreas.dart';
 import 'package:flutter/material.dart';
 import 'markingBeatAreas.dart';
 import 'dataview.dart';
