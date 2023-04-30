@@ -1,3 +1,4 @@
+import 'package:EbeatGoa/addMarker.dart';
 import 'package:EbeatGoa/livelocation.dart';
 import 'package:flutter/material.dart';
 import 'markingBeatAreas.dart';
@@ -14,9 +15,9 @@ class _HomePageState extends State<HomePage> {
   int _currentIndex = 0;
   final List<Widget> _children = [
     Home(),
-    LocationTracker(),
     MapScreen(),
-    ViewData(),
+    LocationTracker(),
+    BeatLocations(),
     AboutUs(),
   ];
 
