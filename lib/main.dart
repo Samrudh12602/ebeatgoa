@@ -1,4 +1,5 @@
 import 'package:EbeatGoa/home.dart';
+import 'package:EbeatGoa/livelocation.dart';
 import 'package:flutter/material.dart';
 import 'register.dart';
 import 'login_page.dart';
@@ -31,6 +32,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/login': (context) => LoginPage(),
         '/home': (context) => HomePage(),
+        '/locationtracker': (context) => LocationTracker(),
         '/register': (context) => RegisterPage(),
         '/maps': (context) => MapScreen(),
         '/profile': (context) => Profile(),
