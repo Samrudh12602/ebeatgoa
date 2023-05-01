@@ -4,8 +4,6 @@ import 'package:cloud_firestore/cloud_firestore.dart'; // import Firestore
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'markingBeatAreas.dart';
-import 'dataview.dart';
-import 'profile.dart';
 import 'about_us.dart';
 
 class HomePage extends StatefulWidget {
@@ -24,8 +22,8 @@ class _HomePageState extends State<HomePage> {
       numBeatLocations: 400,
       numPoliceInspectors: 50,
       numSuperintendents: 3,
-        numBeatAreas: 40,
-        numSubDivisionalOfficers: 10,
+      numBeatAreas: 40,
+      numSubDivisionalOfficers: 10,
     ),
     MapScreen(),
     UserMap(),
@@ -60,7 +58,7 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       backgroundColor: Colors.green[50],
       appBar: AppBar(
-        title: Text('Goa Police'),
+        title: Text('Goa Police Homepage'),
         backgroundColor: Colors.green,
       ),
       drawer: Drawer(
@@ -159,9 +157,9 @@ class Home extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Goa Police App Home'),
-      ),
+      // appBar: AppBar(
+      //   title: Text('Goa Police App Home'),
+      // ),
       body: Padding(
         padding: EdgeInsets.all(16.0),
         child: Column(
@@ -184,12 +182,14 @@ class Home extends StatelessWidget {
                     Colors.red,
                   ),
                   _buildCard(
-                    'Police Inspectors',
+                    '    Police\n '
+                    'Inspector',
                     numPoliceInspectors.toString(),
                     Colors.green,
+
                   ),
                   _buildCard(
-                    'Superintendents',
+                    'Superintendent',
                     numSuperintendents.toString(),
                     Colors.orange,
                   ),
@@ -199,7 +199,8 @@ class Home extends StatelessWidget {
                     Colors.purple,
                   ),
                   _buildCard(
-                    'Sub Divisional Officers',
+                    'Sub-Divisional\n '
+                    '     Officers',
                     numSubDivisionalOfficers.toString(),
                     Colors.teal,
                   ),
