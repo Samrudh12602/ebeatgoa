@@ -4,8 +4,6 @@ import 'package:cloud_firestore/cloud_firestore.dart'; // import Firestore
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'markingBeatAreas.dart';
-import 'dataview.dart';
-import 'profile.dart';
 import 'about_us.dart';
 
 class HomePage extends StatefulWidget {
@@ -24,8 +22,8 @@ class _HomePageState extends State<HomePage> {
       numBeatLocations: 400,
       numPoliceInspectors: 50,
       numSuperintendents: 3,
-        numBeatAreas: 40,
-        numSubDivisionalOfficers: 10,
+      numBeatAreas: 40,
+      numSubDivisionalOfficers: 10,
     ),
     MapScreen(),
     UserMap(),
