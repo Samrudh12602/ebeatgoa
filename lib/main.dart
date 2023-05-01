@@ -32,7 +32,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/login': (context) => LoginPage(),
         '/home': (context) => HomePage(),
-        '/locationtracker': (context) => LocationTracker(),
+        '/locationtracker': (context) => UserMap(),
         '/register': (context) => RegisterPage(),
         '/maps': (context) => MapScreen(),
         '/profile': (context) => Profile(),

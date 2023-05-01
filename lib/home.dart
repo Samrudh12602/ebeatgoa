@@ -1,5 +1,7 @@
 import 'package:EbeatGoa/addMarker.dart';
 import 'package:EbeatGoa/livelocation.dart';
+import 'package:cloud_firestore/cloud_firestore.dart'; // import Firestore
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'markingBeatAreas.dart';
 import 'dataview.dart';
@@ -16,10 +18,36 @@ class _HomePageState extends State<HomePage> {
   final List<Widget> _children = [
     Home(),
     MapScreen(),
-    LocationTracker(),
+    UserMap(),
     BeatLocations(),
     AboutUs(),
   ];
+
+  String _profileImageUrl = '';
+  String _name = '';
+  String _postOfWork = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserData(); // fetch user data when the widget is initialized
+  }
+
+  Future<void> _fetchUserData() async {
+    final user = await FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      final doc = FirebaseFirestore.instance.collection('users').doc(user.uid);
+      final docSnapshot = await doc.get();
+      final data = docSnapshot.data();
+      if (data != null) {
+        setState(() {
+          _name = data['name'] ?? '';
+          _postOfWork = data['postOfWork'] ?? '';
+          _profileImageUrl = data['profileImageUrl'] ?? '';
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,10 +61,12 @@ class _HomePageState extends State<HomePage> {
         child: Column(
           children: [
             UserAccountsDrawerHeader(
-              accountName: Text('John Doe'),
-              accountEmail: Text('Inspector, Goa Police'),
+              accountName: Text(_name ?? ''), // display name
+              accountEmail: Text(_postOfWork ?? ''), // display postOfWork
               currentAccountPicture: CircleAvatar(
-                backgroundImage: AssetImage('assets/images/profile.png'),
+                backgroundImage: _profileImageUrl != null
+                    ? NetworkImage(_profileImageUrl)
+                    : null, // display profile image
               ),
             ),
             ListTile(

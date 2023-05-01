@@ -1,109 +1,135 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
-class LocationTracker extends StatefulWidget {
+class UserMap extends StatefulWidget {
   @override
-  _LocationTrackerState createState() => _LocationTrackerState();
+  _UserMapState createState() => _UserMapState();
 }
 
-class _LocationTrackerState extends State<LocationTracker> {
-  GoogleMapController? _controller;
-  StreamSubscription<DocumentSnapshot>? _subscription;
-  List<Marker> _markers = [];
-  FirebaseAuth _auth = FirebaseAuth.instance;
+class _UserMapState extends State<UserMap> {
+  Completer<GoogleMapController> _controller = Completer();
+  Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
   FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  User? _user = FirebaseAuth.instance.currentUser;
+
+  Future<Position> _getLocation() async {
+    var position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+    return position;
+  }
+
+  Future<void> _updateUserLocation() async {
+    Position position = await _getLocation();
+    String? uid = _user?.uid;
+
+    // Retrieve the latest location document for the current user
+    QuerySnapshot latestLocationSnapshot = await _firestore
+        .collection("users")
+        .doc(uid)
+        .collection("locationdata")
+        .orderBy("timestamp", descending: true)
+        .limit(1)
+        .get();
+
+    // If the latest document for the current user exists, update its location fields
+    if (latestLocationSnapshot.docs.isNotEmpty) {
+      DocumentReference latestLocationRef =
+          latestLocationSnapshot.docs[0].reference;
+      await latestLocationRef.update({
+        "lat": position.latitude,
+        "lng": position.longitude,
+        "timestamp": FieldValue.serverTimestamp(),
+      });
+    }
+    // If the latest document for the current user doesn't exist, add a new document with the current location
+    else {
+      await _firestore
+          .collection("users")
+          .doc(uid)
+          .collection("locationdata")
+          .add({
+        "lat": position.latitude,
+        "lng": position.longitude,
+        "timestamp": FieldValue.serverTimestamp(),
+      });
+    }
+  }
+
+  Future<void> _listenToUserLocation() async {
+    String? uid = _user?.uid;
+
+    StreamSubscription<QuerySnapshot> subscription = _firestore
+        .collection("users")
+        .doc(uid)
+        .collection("locationdata")
+        .snapshots()
+        .listen((querySnapshot) {
+      querySnapshot.docChanges.forEach((docChange) {
+        if (docChange.type == DocumentChangeType.added ||
+            docChange.type == DocumentChangeType.modified) {
+          Map<String, dynamic>? data = docChange.doc.data();
+          LatLng location = LatLng(data!["lat"], data!["lng"]);
+          MarkerId markerId = MarkerId(docChange.doc.id);
+
+          _firestore.collection("users").doc(uid).get().then((userDoc) {
+            String name = userDoc.data()!["name"];
+            Marker marker = Marker(
+              markerId: markerId,
+              position: location,
+              infoWindow: InfoWindow(title: name),
+            );
+
+            // Check if marker with the same MarkerId already exists
+            if (markers.containsKey(markerId)) {
+              setState(() {
+                markers[markerId] =
+                    marker; // Update existing marker with new position
+              });
+            } else {
+              setState(() {
+                markers[markerId] = marker; // Add new marker
+              });
+            }
+          });
+        } else if (docChange.type == DocumentChangeType.removed) {
+          MarkerId markerId = MarkerId(docChange.doc.id);
+
+          setState(() {
+            markers.remove(markerId); // Remove marker from map
+          });
+        }
+      });
+    });
+  }
 
   @override
   void initState() {
     super.initState();
-    _getUserLocation();
-    _subscribeToLocationChanges();
-  }
 
-  void _getUserLocation() async {
-    Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
-    LatLng latLng = LatLng(position.latitude, position.longitude);
-    _addMarker(latLng, "My Location", BitmapDescriptor.defaultMarker);
-  }
+    _listenToUserLocation();
 
-  void _addMarker(LatLng latLng, String title, BitmapDescriptor icon) {
-    setState(() {
-      _markers.add(
-        Marker(
-          markerId: MarkerId(latLng.toString()),
-          position: latLng,
-          infoWindow: InfoWindow(title: title),
-          icon: icon,
-        ),
-      );
+    Timer.periodic(Duration(seconds: 5), (timer) {
+      _updateUserLocation();
     });
-  }
-
-  void _subscribeToLocationChanges() {
-    _subscription = _firestore
-        .collection('locations')
-        .doc(_auth.currentUser?.uid)
-        .snapshots()
-        .listen((DocumentSnapshot snapshot) {
-      if (snapshot.exists) {
-        GeoPoint location = snapshot.get('location');
-        String name = snapshot.get('name');
-        LatLng latLng = LatLng(location.latitude, location.longitude);
-        _addMarker(latLng, name, BitmapDescriptor.defaultMarkerWithHue(120));
-      }
-    });
-  }
-
-  void _updateLocation(Position position) async {
-    GeoPoint geoPoint = GeoPoint(position.latitude, position.longitude);
-    await _firestore
-        .collection('locations')
-        .doc(_auth.currentUser?.uid)
-        .set({'location': geoPoint, 'name': 'Friend1'});
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Location Tracker'),
-      ),
       body: GoogleMap(
-        initialCameraPosition:
-            CameraPosition(target: LatLng(0.0, 0.0), zoom: 14.0),
-        markers: Set.from(_markers),
+        initialCameraPosition: CameraPosition(
+          target: LatLng(15.42478, 73.97977),
+          zoom: 15,
+        ),
+        markers: Set<Marker>.of(markers.values),
         onMapCreated: (GoogleMapController controller) {
-          _controller = controller;
+          _controller.complete(controller);
         },
-        myLocationEnabled: true,
-        myLocationButtonEnabled: true,
-        onCameraMove: (CameraPosition position) {},
-        onCameraIdle: () {},
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          Position position = await Geolocator.getCurrentPosition(
-              desiredAccuracy: LocationAccuracy.high);
-          LatLng latLng = LatLng(position.latitude, position.longitude);
-          _controller?.animateCamera(CameraUpdate.newCameraPosition(
-            CameraPosition(target: latLng, zoom: 14.0),
-          ));
-          _updateLocation(position);
-        },
-        child: Icon(Icons.my_location),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _subscription?.cancel();
-    super.dispose();
   }
 }

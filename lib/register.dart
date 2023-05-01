@@ -12,6 +12,7 @@ class RegisterPage extends StatefulWidget {
 
 class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _contactNumberController =
       TextEditingController();
@@ -47,6 +48,7 @@ class _RegisterPageState extends State<RegisterPage> {
       }
       // If register succeeds, navigate to home page.
       await _firestore.collection('users').doc(userCredential.user!.uid).set({
+        'name': _nameController.text.trim(),
         'email': _emailController.text.trim(),
         'contactNumber': _contactNumberController.text.trim(),
         'postOfWork': _postOfWorkController.text.trim(),
@@ -135,6 +137,13 @@ class _RegisterPageState extends State<RegisterPage> {
                         size: 50,
                       )
                     : null,
+              ),
+            ),
+            SizedBox(height: 16),
+            TextField(
+              controller: _nameController,
+              decoration: InputDecoration(
+                labelText: 'Name',
               ),
             ),
             SizedBox(height: 16),
