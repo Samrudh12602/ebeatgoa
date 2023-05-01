@@ -15,6 +15,9 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _currentIndex = 0;
+  String _profileImageUrl = '';
+  String _name = '';
+  String _postOfWork = '';
   final List<Widget> _children = [
     Home(),
     MapScreen(),
@@ -22,10 +25,6 @@ class _HomePageState extends State<HomePage> {
     BeatLocations(),
     AboutUs(),
   ];
-
-  String _profileImageUrl = '';
-  String _name = '';
-  String _postOfWork = '';
 
   @override
   void initState() {

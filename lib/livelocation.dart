@@ -60,48 +60,50 @@ class _UserMapState extends State<UserMap> {
   }
 
   Future<void> _listenToUserLocation() async {
-    String? uid = _user?.uid;
+    StreamSubscription<QuerySnapshot> subscription =
+        _firestore.collection("users").snapshots().listen((querySnapshot) {
+      querySnapshot.docs.forEach((userDoc) {
+        String uid = userDoc.id;
+        _firestore
+            .collection("users")
+            .doc(uid)
+            .collection("locationdata")
+            .snapshots()
+            .listen((querySnapshot) {
+          querySnapshot.docChanges.forEach((docChange) {
+            if (docChange.type == DocumentChangeType.added ||
+                docChange.type == DocumentChangeType.modified) {
+              Map<String, dynamic>? data = docChange.doc.data();
+              LatLng location = LatLng(data!["lat"], data!["lng"]);
+              MarkerId markerId = MarkerId(uid);
 
-    StreamSubscription<QuerySnapshot> subscription = _firestore
-        .collection("users")
-        .doc(uid)
-        .collection("locationdata")
-        .snapshots()
-        .listen((querySnapshot) {
-      querySnapshot.docChanges.forEach((docChange) {
-        if (docChange.type == DocumentChangeType.added ||
-            docChange.type == DocumentChangeType.modified) {
-          Map<String, dynamic>? data = docChange.doc.data();
-          LatLng location = LatLng(data!["lat"], data!["lng"]);
-          MarkerId markerId = MarkerId(docChange.doc.id);
+              String name = userDoc.data()!["name"];
+              Marker marker = Marker(
+                markerId: markerId,
+                position: location,
+                infoWindow: InfoWindow(title: name),
+              );
 
-          _firestore.collection("users").doc(uid).get().then((userDoc) {
-            String name = userDoc.data()!["name"];
-            Marker marker = Marker(
-              markerId: markerId,
-              position: location,
-              infoWindow: InfoWindow(title: name),
-            );
+              // Check if marker with the same MarkerId already exists
+              if (markers.containsKey(markerId)) {
+                setState(() {
+                  markers[markerId] =
+                      marker; // Update existing marker with new position
+                });
+              } else {
+                setState(() {
+                  markers[markerId] = marker; // Add new marker
+                });
+              }
+            } else if (docChange.type == DocumentChangeType.removed) {
+              MarkerId markerId = MarkerId(uid);
 
-            // Check if marker with the same MarkerId already exists
-            if (markers.containsKey(markerId)) {
               setState(() {
-                markers[markerId] =
-                    marker; // Update existing marker with new position
-              });
-            } else {
-              setState(() {
-                markers[markerId] = marker; // Add new marker
+                markers.remove(markerId); // Remove marker from map
               });
             }
           });
-        } else if (docChange.type == DocumentChangeType.removed) {
-          MarkerId markerId = MarkerId(docChange.doc.id);
-
-          setState(() {
-            markers.remove(markerId); // Remove marker from map
-          });
-        }
+        });
       });
     });
   }
@@ -109,7 +111,6 @@ class _UserMapState extends State<UserMap> {
   @override
   void initState() {
     super.initState();
-
     _listenToUserLocation();
 
     Timer.periodic(Duration(seconds: 5), (timer) {
