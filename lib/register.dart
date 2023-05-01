@@ -1,6 +1,9 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:image_picker/image_picker.dart';
 
 class RegisterPage extends StatefulWidget {
   @override
@@ -12,11 +15,17 @@ class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _contactNumberController =
       TextEditingController();
+  final TextEditingController _postOfWorkController = TextEditingController();
+  final TextEditingController _policeStationController =
+      TextEditingController();
   final TextEditingController _confirmPasswordController =
       TextEditingController();
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseStorage _storage = FirebaseStorage.instance;
+  final picker = ImagePicker();
   bool _isLoading = false;
+  File? _profileImage;
 
   Future<void> _registerWithEmailAndPassword() async {
     try {
@@ -28,10 +37,21 @@ class _RegisterPageState extends State<RegisterPage> {
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
+      String? imageUrl;
+      if (_profileImage != null) {
+        final Reference ref =
+            _storage.ref().child('profileImages/${userCredential.user!.uid}');
+        final UploadTask uploadTask = ref.putFile(_profileImage!);
+        final TaskSnapshot downloadUrl = (await uploadTask);
+        imageUrl = await downloadUrl.ref.getDownloadURL();
+      }
       // If register succeeds, navigate to home page.
       await _firestore.collection('users').doc(userCredential.user!.uid).set({
         'email': _emailController.text.trim(),
         'contactNumber': _contactNumberController.text.trim(),
+        'postOfWork': _postOfWorkController.text.trim(),
+        'policeStation': _policeStationController.text.trim(),
+        'profileImageUrl': imageUrl ?? '',
       });
       Navigator.pushReplacementNamed(context, '/login');
     } on FirebaseAuthException catch (e) {
@@ -71,6 +91,8 @@ class _RegisterPageState extends State<RegisterPage> {
           },
         );
       }
+    } catch (e) {
+      print(e);
     } finally {
       setState(() {
         _isLoading = false;
@@ -78,85 +100,93 @@ class _RegisterPageState extends State<RegisterPage> {
     }
   }
 
+  Future<void> _pickImage() async {
+    final pickedFile = await picker.getImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        _profileImage = File(pickedFile.path);
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        color: Colors.white,
-        child: SafeArea(
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Image.asset(
-                  'assets/images/goa_police_logo.png',
-                  height: 200,
-                  width: 200,
-                ),
-                SizedBox(height: 30.0),
-                Text(
-                  'Create an account',
-                  style: TextStyle(
-                    color: Colors.green[800],
-                    fontSize: 24.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                SizedBox(height: 30.0),
-                _buildTextField('Email', Icons.email, _emailController),
-                SizedBox(height: 20.0),
-                _buildTextField(
-                    'Contact Number', Icons.phone, _contactNumberController),
-                SizedBox(height: 20.0),
-                _buildTextField(
-                    'Confirm Password', Icons.lock, _confirmPasswordController,
-                    isObscure: true),
-                SizedBox(height: 20.0),
-                ElevatedButton(
-                  onPressed: _isLoading ? null : _registerWithEmailAndPassword,
-                  child: Text(
-                    'Register',
-                    style: TextStyle(fontSize: 20.0),
-                  ),
-                  style: ButtonStyle(
-                    padding: MaterialStateProperty.all(
-                        EdgeInsets.symmetric(vertical: 15.0)),
-                    backgroundColor:
-                        MaterialStateProperty.all<Color>(Colors.green[800]!),
-                  ),
-                ),
-                SizedBox(height: 20.0),
-                TextButton(
-                  onPressed: _isLoading
-                      ? null
-                      : () => Navigator.pushReplacementNamed(context, '/login'),
-                  child: Text(
-                    'Already have an account? Login here.',
-                    style: TextStyle(color: Colors.green[800], fontSize: 18.0),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
+      appBar: AppBar(
+        title: Text('Register'),
       ),
-    );
-  }
-
-  Widget _buildTextField(
-      String labelText, IconData prefixIcon, TextEditingController controller,
-      {bool isObscure = false}) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 20.0),
-      child: TextField(
-        obscureText: isObscure,
-        controller: controller,
-        decoration: InputDecoration(
-          labelText: labelText,
-          prefixIcon: Icon(prefixIcon),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(20.0),
-          ),
+      body: SingleChildScrollView(
+        padding: EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            if (_isLoading) LinearProgressIndicator(),
+            SizedBox(height: 16),
+            GestureDetector(
+              onTap: _pickImage,
+              child: CircleAvatar(
+                radius: 60,
+                backgroundColor: Colors.grey[200],
+                backgroundImage:
+                    _profileImage != null ? FileImage(_profileImage!) : null,
+                child: _profileImage == null
+                    ? Icon(
+                        Icons.camera_alt,
+                        size: 50,
+                      )
+                    : null,
+              ),
+            ),
+            SizedBox(height: 16),
+            TextField(
+              controller: _emailController,
+              decoration: InputDecoration(
+                labelText: 'Email',
+              ),
+            ),
+            SizedBox(height: 16),
+            TextField(
+              controller: _passwordController,
+              obscureText: true,
+              decoration: InputDecoration(
+                labelText: 'Password',
+              ),
+            ),
+            SizedBox(height: 16),
+            TextField(
+              controller: _confirmPasswordController,
+              obscureText: true,
+              decoration: InputDecoration(
+                labelText: 'Confirm Password',
+              ),
+            ),
+            SizedBox(height: 16),
+            TextField(
+              controller: _contactNumberController,
+              decoration: InputDecoration(
+                labelText: 'Contact Number',
+              ),
+            ),
+            SizedBox(height: 16),
+            TextField(
+              controller: _postOfWorkController,
+              decoration: InputDecoration(
+                labelText: 'Post of Work',
+              ),
+            ),
+            SizedBox(height: 16),
+            TextField(
+              controller: _policeStationController,
+              decoration: InputDecoration(
+                labelText: 'Police Station',
+              ),
+            ),
+            SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: _registerWithEmailAndPassword,
+              child: Text('Register'),
+            ),
+          ],
         ),
       ),
     );
