@@ -19,7 +19,12 @@ class _HomePageState extends State<HomePage> {
   String _name = '';
   String _postOfWork = '';
   final List<Widget> _children = [
-    Home(),
+    Home(
+      numBeatOfficers: 10,
+      numBeatLocations: 5,
+      numPoliceInspectors: 3,
+      numSuperintendents: 1,
+    ),
     MapScreen(),
     UserMap(),
     BeatLocations(),
@@ -133,15 +138,100 @@ class _HomePageState extends State<HomePage> {
 }
 
 class Home extends StatelessWidget {
+  final int numBeatOfficers;
+  final int numBeatLocations;
+  final int numPoliceInspectors;
+  final int numSuperintendents;
+
+  Home({
+    required this.numBeatOfficers,
+    required this.numBeatLocations,
+    required this.numPoliceInspectors,
+    required this.numSuperintendents,
+  });
+
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Text(
-        'Welcome to the Goa Police App Home Page',
-        style: TextStyle(
-          color: Colors.green,
-          fontSize: 24.0,
-        ),
+    return Container(
+      color: Colors.white,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 40.0),
+            child: Text(
+              'Welcome to the Goa Police App Home Page',
+              style: TextStyle(
+                color: Colors.green,
+                fontSize: 24.0,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          Expanded(
+            child: GridView.count(
+              crossAxisCount: 2,
+              childAspectRatio: 1.0,
+              mainAxisSpacing: 10.0,
+              crossAxisSpacing: 10.0,
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              children: [
+                _buildCard(
+                  'Beat Officers',
+                  numBeatOfficers.toString(),
+                  Colors.blue,
+                  Icons.people,
+                ),
+                _buildCard(
+                  'Beat Locations',
+                  numBeatLocations.toString(),
+                  Colors.orange,
+                  Icons.location_on,
+                ),
+                _buildCard(
+                  'Police Inspectors',
+                  numPoliceInspectors.toString(),
+                  Colors.pink,
+                  Icons.security,
+                ),
+                _buildCard(
+                  'Superintendents',
+                  numSuperintendents.toString(),
+                  Colors.green,
+                  Icons.assignment_ind,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCard(String title, String value, Color color, IconData icon) {
+    return Card(
+      elevation: 4.0,
+      color: color,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            icon,
+            color: Colors.white,
+            size: 40.0,
+          ),
+          SizedBox(height: 20.0),
+          Text(
+            title,
+            style: TextStyle(color: Colors.white, fontSize: 18.0),
+          ),
+          SizedBox(height: 10.0),
+          Text(
+            value,
+            style: TextStyle(color: Colors.white, fontSize: 24.0),
+          ),
+        ],
       ),
     );
   }

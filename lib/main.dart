@@ -35,7 +35,12 @@ class MyApp extends StatelessWidget {
         '/locationtracker': (context) => UserMap(),
         '/register': (context) => RegisterPage(),
         '/maps': (context) => MapScreen(),
-        '/profile': (context) => Profile(),
+        '/profile': (context) => Profile(
+          name: 'John Doe',
+          designation: 'Inspector',
+          policeStation: 'XYZ Police Station',
+          photoUrl: 'https://example.com/john_doe.jpg',
+        ),
         '/data': (context) => ViewData(),
         '/about': (context) => AboutUs(),
       },
