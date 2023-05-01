@@ -123,7 +123,7 @@ class _UserMapState extends State<UserMap> {
       body: GoogleMap(
         initialCameraPosition: CameraPosition(
           target: LatLng(15.42478, 73.97977),
-          zoom: 15,
+          zoom: 10,
         ),
         markers: Set<Marker>.of(markers.values),
         onMapCreated: (GoogleMapController controller) {
