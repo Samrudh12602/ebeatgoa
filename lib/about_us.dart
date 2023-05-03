@@ -8,7 +8,7 @@ class AboutUs extends StatelessWidget {
       body: Column(
         children: [
           Container(
-            height: 200,
+            height: 175,
             decoration: BoxDecoration(
               color: Colors.green,
               borderRadius: BorderRadius.only(
