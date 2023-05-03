@@ -177,7 +177,8 @@ class Home extends StatelessWidget {
                     Colors.blue,
                   ),
                   _buildCard(
-                    'Beat Locations',
+                    '     Beat\n'
+                    ' Locations',
                     numBeatLocations.toString(),
                     Colors.red,
                   ),
