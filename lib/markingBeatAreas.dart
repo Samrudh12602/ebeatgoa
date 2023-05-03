@@ -101,17 +101,58 @@ class _MapScreenState extends State<MapScreen> {
       final fileName = DateTime.now().toString() + '.jpg';
       final ref =
           FirebaseStorage.instance.ref().child('images').child(fileName);
-      await ref.putFile(file);
-      final imageUrl = await ref.getDownloadURL();
 
-      // Add new collection to Firestore
-      final beatLocations = FirebaseFirestore.instance
-          .collection('BeatLocations')
-          .doc(circleDocId);
-      await beatLocations.collection('Images').add({
-        'ImageUrl': imageUrl,
-        'Timestamp': Timestamp.now(),
-      });
+      try {
+        await ref.putFile(file);
+        final imageUrl = await ref.getDownloadURL();
+
+        // Add new collection to Firestore
+        final beatLocations = FirebaseFirestore.instance
+            .collection('BeatLocations')
+            .doc(circleDocId);
+        await beatLocations.collection('Images').add({
+          'ImageUrl': imageUrl,
+          'Timestamp': Timestamp.now(),
+        });
+
+        // Show confirmation message
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Success'),
+              content: Text('Image uploaded successfully.'),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
+      } catch (e) {
+        // Show error message
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Error'),
+              content: Text('Failed to upload image: $e'),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
+      }
     }
   }
 
