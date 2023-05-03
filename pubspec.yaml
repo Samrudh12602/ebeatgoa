@@ -24,6 +24,8 @@ dependencies:
   location: ^4.3.0
   image_cropper: ^1.4.0
   shared_preferences: ^2.0.8
+  url_launcher: ^6.0.9
+  carousel_slider: ^4.0.0
 
 
 dev_dependencies:

@@ -5,7 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'markingBeatAreas.dart';
 import 'about_us.dart';
-
+import 'package:carousel_slider/carousel_slider.dart';
 class HomePage extends StatefulWidget {
   @override
   _HomePageState createState() => _HomePageState();
@@ -58,7 +58,7 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       backgroundColor: Colors.green[50],
       appBar: AppBar(
-        title: Text('Goa Police Homepage'),
+        title: Text('Goa Police'),
         backgroundColor: Colors.green,
       ),
       drawer: Drawer(
@@ -154,55 +154,129 @@ class Home extends StatelessWidget {
     required this.numSubDivisionalOfficers,
   });
 
+  // @override
+  // Widget build(BuildContext context) {
+  //   return Scaffold(
+  //     appBar: AppBar(
+  //       title: Text('Goa Police App Home'),
+  //     ),
+  //     body: Padding(
+  //       padding: EdgeInsets.all(16.0),
+  //       child: Column(
+  //         crossAxisAlignment: CrossAxisAlignment.stretch,
+  //         children: [
+  //           Expanded(
+  //             child: GridView.count(
+  //               crossAxisCount: 2,
+  //               mainAxisSpacing: 10.0,
+  //               crossAxisSpacing: 10.0,
+  //               children: [
+  //                 _buildCard(
+  //                   'Beat Officers',
+  //                   numBeatOfficers.toString(),
+  //                   Colors.blue,
+  //                 ),
+  //                 _buildCard(
+  //                   'Beat Locations',
+  //                   numBeatLocations.toString(),
+  //                   Colors.red,
+  //                 ),
+  //                 _buildCard(
+  //                   'Police Inspectors',
+  //                   numPoliceInspectors.toString(),
+  //                   Colors.green,
+  //                 ),
+  //                 _buildCard(
+  //                   'Superintendents',
+  //                   numSuperintendents.toString(),
+  //                   Colors.orange,
+  //                 ),
+  //                 _buildCard(
+  //                   'Beat Areas',
+  //                   numBeatAreas.toString(),
+  //                   Colors.purple,
+  //                 ),
+  //                 _buildCard(
+  //                   'Sub Divisional Officers',
+  //                   numSubDivisionalOfficers.toString(),
+  //                   Colors.teal,
+  //                 ),
+  //               ],
+  //             ),
+  //           ),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
+  final List<String> _imagePaths = [    'assets/images/images22.webp',    'assets/images/images23.jpg',    'assets/images/images24.webp',  ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: AppBar(
-      //   title: Text('Goa Police App Home'),
-      // ),
+      appBar: AppBar(
+        title: Text('Goa Police App Home'),
+      ),
       body: Padding(
         padding: EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            CarouselSlider(
+              items: _imagePaths.map((imagePath) {
+                return Image.asset(
+                  imagePath,
+                  fit: BoxFit.cover,
+                );
+              }).toList(),
+              options: CarouselOptions(
+                autoPlay: true,
+                enlargeCenterPage: true,
+                aspectRatio: 16 / 9,
+                onPageChanged: (index, reason) {},
+              ),
+            ),
+            SizedBox(height: 20.0),
             Expanded(
               child: GridView.count(
                 crossAxisCount: 2,
                 mainAxisSpacing: 10.0,
                 crossAxisSpacing: 10.0,
                 children: [
-                  _buildCard(
+                  _buildCardWithIcon(
                     'Beat Officers',
                     numBeatOfficers.toString(),
+                    Icons.person,
                     Colors.blue,
                   ),
-                  _buildCard(
-                    '     Beat\n'
-                    ' Locations',
+                  _buildCardWithIcon(
+                    'Beat Locations',
                     numBeatLocations.toString(),
+                    Icons.location_on,
                     Colors.red,
                   ),
-                  _buildCard(
-                    '    Police\n '
-                    'Inspector',
+                  _buildCardWithIcon(
+                    'Police Inspectors',
                     numPoliceInspectors.toString(),
+                    Icons.person_outline,
                     Colors.green,
-
                   ),
-                  _buildCard(
-                    'Superintendent',
+                  _buildCardWithIcon(
+                    'Superintendents',
                     numSuperintendents.toString(),
+                    Icons.people_outline,
                     Colors.orange,
                   ),
-                  _buildCard(
+                  _buildCardWithIcon(
                     'Beat Areas',
                     numBeatAreas.toString(),
+                    Icons.map_outlined,
                     Colors.purple,
                   ),
-                  _buildCard(
-                    'Sub-Divisional\n '
-                    '     Officers',
+                  _buildCardWithIcon(
+                    'Sub-Divisional Officers',
                     numSubDivisionalOfficers.toString(),
+                    Icons.supervisor_account_outlined,
                     Colors.teal,
                   ),
                 ],
@@ -214,7 +288,7 @@ class Home extends StatelessWidget {
     );
   }
 
-  Widget _buildCard(String title, String subtitle, Color color) {
+  Widget _buildCardWithIcon(String title, String subtitle, IconData icon, Color color) {
     return Card(
       elevation: 4.0,
       color: color,
@@ -224,11 +298,17 @@ class Home extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          Icon(
+            icon,
+            color: Colors.white,
+            size: 48.0,
+          ),
+          SizedBox(height: 10.0),
           Text(
             title,
             style: TextStyle(
               color: Colors.white,
-              fontSize: 24.0,
+              fontSize: 20.0,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -245,3 +325,34 @@ class Home extends StatelessWidget {
     );
   }
 }
+//   Widget _buildCard(String title, String subtitle, Color color) {
+//     return Card(
+//       elevation: 4.0,
+//       color: color,
+//       shape: RoundedRectangleBorder(
+//         borderRadius: BorderRadius.circular(16.0),
+//       ),
+//       child: Column(
+//         mainAxisAlignment: MainAxisAlignment.center,
+//         children: [
+//           Text(
+//             title,
+//             style: TextStyle(
+//               color: Colors.white,
+//               fontSize: 24.0,
+//               fontWeight: FontWeight.bold,
+//             ),
+//           ),
+//           SizedBox(height: 10.0),
+//           Text(
+//             subtitle,
+//             style: TextStyle(
+//               color: Colors.white,
+//               fontSize: 20.0,
+//             ),
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+// }
