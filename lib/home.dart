@@ -1,11 +1,13 @@
 import 'package:EbeatGoa/addMarker.dart';
 import 'package:EbeatGoa/livelocation.dart';
+import 'package:EbeatGoa/test.dart';
 import 'package:cloud_firestore/cloud_firestore.dart'; // import Firestore
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'markingBeatAreas.dart';
 import 'about_us.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+
 class HomePage extends StatefulWidget {
   @override
   _HomePageState createState() => _HomePageState();
@@ -209,7 +211,11 @@ class Home extends StatelessWidget {
   //     ),
   //   );
   // }
-  final List<String> _imagePaths = [    'assets/images/images22.webp',    'assets/images/images23.jpg',    'assets/images/images24.webp',  ];
+  final List<String> _imagePaths = [
+    'assets/images/images22.webp',
+    'assets/images/images23.jpg',
+    'assets/images/images24.webp',
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -288,7 +294,8 @@ class Home extends StatelessWidget {
     );
   }
 
-  Widget _buildCardWithIcon(String title, String subtitle, IconData icon, Color color) {
+  Widget _buildCardWithIcon(
+      String title, String subtitle, IconData icon, Color color) {
     return Card(
       elevation: 4.0,
       color: color,

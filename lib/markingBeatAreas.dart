@@ -4,6 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 
 class MapScreen extends StatefulWidget {
   @override
@@ -12,6 +15,7 @@ class MapScreen extends StatefulWidget {
 
 class _MapScreenState extends State<MapScreen> {
   late GoogleMapController _controller;
+  String? circleDocId;
   late Marker _currentLocationMarker = Marker(
     markerId: MarkerId('CurrentLocation'),
     infoWindow: InfoWindow(
@@ -87,16 +91,42 @@ class _MapScreenState extends State<MapScreen> {
     _startListening();
   }
 
-  void _checkIfWithinCircle() {
+  Future<void> _uploadImage() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.getImage(source: ImageSource.camera);
+
+    if (pickedFile != null) {
+      // Upload image to Firebase Storage
+      final file = File(pickedFile.path);
+      final fileName = DateTime.now().toString() + '.jpg';
+      final ref =
+          FirebaseStorage.instance.ref().child('images').child(fileName);
+      await ref.putFile(file);
+      final imageUrl = await ref.getDownloadURL();
+
+      // Add new collection to Firestore
+      final beatLocations = FirebaseFirestore.instance
+          .collection('BeatLocations')
+          .doc(circleDocId);
+      await beatLocations.collection('Images').add({
+        'ImageUrl': imageUrl,
+        'Timestamp': Timestamp.now(),
+      });
+    }
+  }
+
+  void _checkIfWithinCircle() async {
     bool isWithinCircle = false;
-    for (var marker in _markers) {
+
+    for (var circle in _circles) {
       if (Geolocator.distanceBetween(
               _currentLocation.latitude,
               _currentLocation.longitude,
-              marker.position.latitude,
-              marker.position.longitude) <=
-          50) {
+              circle.center.latitude,
+              circle.center.longitude) <=
+          circle.radius) {
         isWithinCircle = true;
+        circleDocId = circle.circleId.value;
         break;
       }
     }
@@ -116,7 +146,7 @@ class _MapScreenState extends State<MapScreen> {
                 SizedBox(height: 16),
                 ElevatedButton.icon(
                   onPressed: () {
-                    // TODO: Implement upload functionality
+                    _uploadImage();
                     Navigator.of(context).pop();
                   },
                   icon: Icon(Icons.upload),

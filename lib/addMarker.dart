@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:random_string/random_string.dart';
 
 class BeatLocations extends StatefulWidget {
   @override
@@ -32,10 +32,10 @@ class _BeatLocationsState extends State<BeatLocations> {
       infoWindow: InfoWindow(title: _markerName),
     );
     _markers.add(marker);
-
+    String id = randomAlphaNumeric(10);
     // Add Circle
     Circle circle = Circle(
-      circleId: CircleId('beat_location_circle'),
+      circleId: CircleId(id),
       center: _markerLatLng,
       radius: 50.0,
       strokeWidth: 2,
@@ -47,7 +47,7 @@ class _BeatLocationsState extends State<BeatLocations> {
     // Upload Marker and Circle data to Firestore
     CollectionReference beatLocations =
         FirebaseFirestore.instance.collection('BeatLocations');
-    await beatLocations.doc().set({
+    await beatLocations.doc(_circleName).set({
       'markerName': _markerName,
       'circleName': _circleName,
       'markerPosition':
