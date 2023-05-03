@@ -55,65 +55,67 @@ class LoginPage extends StatelessWidget {
       appBar: AppBar(
         title: Text('Login'),
       ),
-      body: Padding(
-        padding: EdgeInsets.all(16),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            Image.asset(
-              'assets/images/goa_police_logo.png',
-              height: 200,
-              width: 200,
-            ),
-            SizedBox(height: 30.0),
-            TextFormField(
-              controller: _emailController,
-              keyboardType: TextInputType.emailAddress,
-              decoration: InputDecoration(
-                labelText: 'Email',
-                prefixIcon: Icon(Icons.email),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: EdgeInsets.all(16),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              Image.asset(
+                'assets/images/goa_police_logo.png',
+                height: 200,
+                width: 200,
               ),
-            ),
-            SizedBox(height: 16),
-            TextFormField(
-              controller: _passwordController,
-              obscureText: true,
-              decoration: InputDecoration(
-                labelText: 'Password',
-                prefixIcon: Icon(Icons.lock),
+              SizedBox(height: 30.0),
+              TextFormField(
+                controller: _emailController,
+                keyboardType: TextInputType.emailAddress,
+                decoration: InputDecoration(
+                  labelText: 'Email',
+                  prefixIcon: Icon(Icons.email),
+                ),
               ),
-            ),
-            SizedBox(height: 16),
-            ElevatedButton(
-              child: Text('Login'),
-              onPressed: () => _signInWithEmail(context),
-            ),
-            SizedBox(height: 16),
-            TextButton(
-              child: Text('Create an Account'),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (BuildContext context) => RegisterPage(),
-                  ),
-                );
-              },
-            ),
-            SizedBox(height: 16),
-            TextButton(
-              child: Text('Sign in with Phone Number'),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (BuildContext context) => PhoneLoginPage(),
-                  ),
-                );
-              },
-            ),
-          ],
+              SizedBox(height: 16),
+              TextFormField(
+                controller: _passwordController,
+                obscureText: true,
+                decoration: InputDecoration(
+                  labelText: 'Password',
+                  prefixIcon: Icon(Icons.lock),
+                ),
+              ),
+              SizedBox(height: 16),
+              ElevatedButton(
+                child: Text('Login'),
+                onPressed: () => _signInWithEmail(context),
+              ),
+              SizedBox(height: 16),
+              TextButton(
+                child: Text('Create an Account'),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (BuildContext context) => RegisterPage(),
+                    ),
+                  );
+                },
+              ),
+              SizedBox(height: 16),
+              TextButton(
+                child: Text('Sign in with Phone Number'),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (BuildContext context) => PhoneLoginPage(),
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );
