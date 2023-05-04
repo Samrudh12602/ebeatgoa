@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'markingBeatAreas.dart';
 import 'about_us.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -79,7 +80,7 @@ class _HomePageState extends State<HomePage> {
               leading: Icon(Icons.public),
               title: Text('Goa Police Website'),
               onTap: () {
-                // Handle website click
+                launch('https://citizen.goapolice.gov.in/');
               },
             ),
             ListTile(
@@ -93,7 +94,11 @@ class _HomePageState extends State<HomePage> {
               leading: Icon(Icons.contact_mail),
               title: Text('Contact Developers'),
               onTap: () {
-                // Handle contact click
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Go to HelpDesk Menu'),
+                  ),
+                );
               },
             ),
           ],
@@ -116,16 +121,16 @@ class _HomePageState extends State<HomePage> {
             label: 'Maps',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.location_city),
+            icon: Icon(Icons.location_on),
             label: 'Live Tracker',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.data_usage),
+            icon: Icon(Icons.add_location_alt),
             label: 'Add Data',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.info),
-            label: 'About Us',
+            icon: Icon(Icons.help),
+            label: 'Help Desk',
           ),
         ],
       ),
@@ -277,7 +282,8 @@ class Home extends StatelessWidget {
                     Colors.purple,
                   ),
                   _buildCardWithIcon(
-                    'Sub-Divisional Officers',
+                    'Sub-Divisional\n'
+                    '      Officers',
                     numSubDivisionalOfficers.toString(),
                     Icons.supervisor_account_outlined,
                     Colors.teal,
