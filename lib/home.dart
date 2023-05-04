@@ -116,12 +116,12 @@ class _HomePageState extends State<HomePage> {
             label: 'Maps',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.person),
+            icon: Icon(Icons.location_city),
             label: 'Profile',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.data_usage),
-            label: 'View Data',
+            label: 'Add Data',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.info),
