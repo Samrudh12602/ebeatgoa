@@ -117,7 +117,7 @@ class _HomePageState extends State<HomePage> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.location_city),
-            label: 'Profile',
+            label: 'Live Tracker',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.data_usage),
